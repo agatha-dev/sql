@@ -1,0 +1,289 @@
+# sql
+
+USE [KLINIKOSNET_DSV]
+GO
+/****** Object:  StoredProcedure [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Intercorrente]    Script Date: 21/06/2021 12:12:06 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Intercorrente] @inter_codigo char(12) = null, @evouti_codigo int = null
+as
+begin
+select	convert(varchar(10), eui.DataInclusao, 103) as data,
+		convert(varchar(5), eui.DataInclusao, 114) as hora,
+		i.inter_codigo as internacao,
+		p.pac_nome as nome,
+		p.pac_idade	as idade,
+		isnull( p.pac_cartao_nsaude, p.pac_cartao_nsaude_provisorio) as CNS,
+		l.locint_descricao as leito,
+		i.inter_datainter as dtinternacao,
+		eui.Intercorrencia as Intercorrencia,
+		isnull(eui.rascunho,0) as Rascunho,
+		prof.prof_nome
+from EvolucaoUtiIntercorrencia eui
+inner join internacao i on eui.inter_codigo = i.inter_codigo
+inner join vwleito l on l.lei_codigo = i.lei_codigo and l.locatend_codigo = i.locatend_leito
+inner join paciente p on p.pac_codigo = i.pac_codigo 
+inner join Profissional prof on prof.prof_codigo = eui.prof_codigo and prof.locatend_codigo = eui.locatend_codigo
+where eui.evouti_codigo = isnull(@evouti_codigo, eui.evouti_codigo)
+and   eui.inter_codigo = isnull(@inter_codigo, eui.inter_codigo)
+
+end
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+USE [KLINIKOSNET_DSV]
+GO
+/****** Object:  StoredProcedure [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Noturno]    Script Date: 21/06/2021 13:46:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Noturno] @inter_codigo char(12) = null, @evouti_codigo int = null
+as
+begin
+select	convert(varchar(10), eun.DataInclusao, 103) as data,
+		convert(varchar(5), eun.DataInclusao, 114) as hora,
+		i.inter_codigo as internacao,
+		p.pac_nome as nome,
+		p.pac_idade	as idade,
+		isnull( p.pac_cartao_nsaude, p.pac_cartao_nsaude_provisorio) as CNS,
+		l.locint_descricao as leito,
+		i.inter_datainter as dtinternacao,
+		eun.Diurese as Diurese,
+		eun.TAxMax as TAxMax,
+		eun.Hgt as Hgt,
+		eun.Hd as Hd,
+		eun.Insulina as Insulina,
+		eun.FuncaoIntestinal as FuncaoIntestinal,
+		eun.Bh as Bh,
+		eun.Intercorrencia as Intercorrencia,
+		eun.Conduta as Conduta,
+		isnull(eun.rascunho,0) as Rascunho,
+		prof.prof_nome
+from EvolucaoUtiNoturna eun
+inner join internacao i on eun.inter_codigo = i.inter_codigo
+inner join VWLEITO_COMPLETO l on l.lei_codigo = i.lei_codigo and l.locatend_codigo = i.locatend_leito
+inner join paciente p on p.pac_codigo = i.pac_codigo 
+inner join Profissional prof on prof.prof_codigo = eun.prof_codigo and prof.locatend_codigo = eun.locatend_codigo
+where eun.evouti_codigo = isnull(@evouti_codigo, eun.evouti_codigo)
+and   eun.inter_codigo = isnull(@inter_codigo, eun.inter_codigo)
+
+end
+
+-----------------------------------------------------------------
+
+BANCO DE DADOS PROCEDURE EDITADAS
+
+ALTER PROCEDURE [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Intercorrente] @inter_codigo char(12) = null, @evouti_codigo sysname = null
+AS
+BEGIN
+  DECLARE @SQL VARCHAR(8000) = ''
+  SET @SQL =                   '     SELECT CONVERT(VARCHAR(10), EUI.DATAINCLUSAO, 103) AS DATA '
+  SET @SQL = @SQL + CHAR(10) + '          , CONVERT(VARCHAR(5), EUI.DATAINCLUSAO, 114) AS HORA '
+  SET @SQL = @SQL + CHAR(10) + '          , I.INTER_CODIGO AS INTERNACAO '
+  SET @SQL = @SQL + CHAR(10) + '          , P.PAC_NOME AS NOME '
+  SET @SQL = @SQL + CHAR(10) + '          , P.PAC_IDADE AS IDADE '
+  SET @SQL = @SQL + CHAR(10) + '          , ISNULL( P.PAC_CARTAO_NSAUDE, P.PAC_CARTAO_NSAUDE_PROVISORIO) AS CNS '
+  SET @SQL = @SQL + CHAR(10) + '          , L.LOCINT_DESCRICAO AS LEITO '
+  SET @SQL = @SQL + CHAR(10) + '          , I.INTER_DATAINTER AS DTINTERNACAO '
+  SET @SQL = @SQL + CHAR(10) + '          , EUI.INTERCORRENCIA AS INTERCORRENCIA '
+  SET @SQL = @SQL + CHAR(10) + '          , ISNULL(EUI.RASCUNHO,0) AS RASCUNHO '
+  SET @SQL = @SQL + CHAR(10) + '          , PROF.PROF_NOME '
+  SET @SQL = @SQL + CHAR(10) + '       FROM EVOLUCAOUTIINTERCORRENCIA EUI '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN INTERNACAO I ON EUI.INTER_CODIGO = I.INTER_CODIGO '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN VWLEITO L ON L.LEI_CODIGO = I.LEI_CODIGO AND L.LOCATEND_CODIGO = I.LOCATEND_LEITO '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN PACIENTE P ON P.PAC_CODIGO = I.PAC_CODIGO '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN PROFISSIONAL PROF ON PROF.PROF_CODIGO = EUI.PROF_CODIGO AND PROF.LOCATEND_CODIGO = EUI.LOCATEND_CODIGO '
+  SET @SQL = @SQL + CHAR(10) + '      WHERE 1=1 '
+  SET @SQL = @SQL + CHAR(10) + '        AND EUI.EVOUTI_CODIGO IN ( ' + @EVOUTI_CODIGO + ' ) '
+  SET @SQL = @SQL + CHAR(10) + '        AND EUI.INTER_CODIGO = ISNULL( ''' + @INTER_CODIGO + ''', EUI.INTER_CODIGO) '
+  EXEC (@SQL)
+END
+GO
+
+ALTER PROCEDURE [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_DIURNA] @inter_codigo char(12) = null, @evouti_codigo sysname = null
+AS
+BEGIN
+  DECLARE @SQL VARCHAR(8000) = ''
+  SET @SQL =                   '     SELECT	CONVERT(VARCHAR(10), EUD.DATAINCLUSAO, 103) AS DATA '
+  SET @SQL = @SQL + CHAR(10) + '          , CONVERT(VARCHAR(5), DATAINCLUSAO, 114) AS HORA '
+  SET @SQL = @SQL + CHAR(10) + '          , I.INTER_CODIGO AS INTERNACAO '
+  SET @SQL = @SQL + CHAR(10) + '          , P.PAC_NOME AS NOME '
+  SET @SQL = @SQL + CHAR(10) + '          , P.PAC_IDADE	AS IDADE '
+  SET @SQL = @SQL + CHAR(10) + '          , ISNULL( P.PAC_CARTAO_NSAUDE, P.PAC_CARTAO_NSAUDE_PROVISORIO) AS CNS '
+  SET @SQL = @SQL + CHAR(10) + '          , L.LOCINT_DESCRICAO AS LEITO '
+  SET @SQL = @SQL + CHAR(10) + '          , I.INTER_DATAINTER AS DTINTERNACAO '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.DIAGNOSTICOS AS DIAGNOSTICOS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.EXAMESCOMPLEMENTARES AS EXAMESCOMPLEMENTARES '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.ACESSOS AS ACESSOS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.DRENOS AS DRENOS '
+  SET @SQL = @SQL + CHAR(10) + '          ,  STUFF((SELECT ''; ''+  ISNULL(DRIPPINGDESCRICAO,'''') FROM DRIPPINGEVOLUCAODIURNA DRI '
+  SET @SQL = @SQL + CHAR(10) + '                     WHERE DRI.INTERCODIGO = EUD.INTER_CODIGO '
+  SET @SQL = @SQL + CHAR(10) + '                       AND DRI.CODIGOUTIDIURNO = EUD.EVOUTI_CODIGO FOR XML PATH(''''), TYPE).value(''.'', ''NVARCHAR(MAX)'') ,1,2,'''') AS DRIPPING '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.ANTIBIOTICOS AS ANTIBIOTICOS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PAS AS PAS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PAD AS PAD '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PAM AS PAM '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.FC AS FC '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PIC AS PIC '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.TAX AS TAX '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.SPO2 AS SPO2 '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.HGT AS HGT '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.INSUL AS INSULINA '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.FR AS FR '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.ENTRADAS AS ENTRADAS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.SAIDAS AS SAIDAS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.DIURESE1 AS DIURESE1 '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.DIURESE2 AS DIURESE2 '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.HEMODIALISE AS HEMODIALISE '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.RG AS RG '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.FUNCAOINTESTINAL AS FUNCAOINSTESTINAL '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.OUTROS AS OUTROS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.TOTAL AS TOTAL '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.MODALIDADE AS MODALIDADE '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PESOPREDITO AS PESOPREDITO '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PINSPPSUP AS PINSPPSUP '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.PEEP AS PEEP '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.VC AS VC '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.FIO2 AS FIO2 '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.FR AS FR '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.TINSP AS TINSP '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.EXAMEFISICO AS EXAMEFISICO '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.CONDUTAS AS CONDUTAS '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.CULTURA '
+  SET @SQL = @SQL + CHAR(10) + '          , EUD.COVID '
+  SET @SQL = @SQL + CHAR(10) + '          , ISNULL(EUD.RASCUNHO,0) AS RASCUNHO '
+  SET @SQL = @SQL + CHAR(10) + '          , PROF.PROF_NOME '
+  SET @SQL = @SQL + CHAR(10) + ' FROM EVOLUCAOUTIDIURNA EUD '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN INTERNACAO I ON EUD.INTER_CODIGO = I.INTER_CODIGO  '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN VWLEITO_COMPLETO L ON L.LEI_CODIGO = I.LEI_CODIGO AND L.LOCATEND_CODIGO = I.LOCATEND_LEITO '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN PACIENTE P ON P.PAC_CODIGO = I.PAC_CODIGO '
+  SET @SQL = @SQL + CHAR(10) + ' INNER JOIN PROFISSIONAL PROF ON PROF.PROF_CODIGO = EUD.PROF_CODIGO AND PROF.LOCATEND_CODIGO = EUD.LOCATEND_CODIGO ' 
+  SET @SQL = @SQL + CHAR(10) + '      WHERE 1=1 '
+  SET @SQL = @SQL + CHAR(10) + '        AND EUD.EVOUTI_CODIGO IN ( ' + @EVOUTI_CODIGO + ' ) '
+  SET @SQL = @SQL + CHAR(10) + '        AND EUD.INTER_CODIGO = ISNULL(''' + @INTER_CODIGO + ''', EUD.INTER_CODIGO) '
+  EXEC (@SQL)
+END
+GO
+
+ALTER PROCEDURE [dbo].[KSP_RELATORIO_EVOLUCAO_CTI_Noturno] @inter_codigo char(12) = null, @evouti_codigo sysname = null
+AS
+BEGIN
+  DECLARE @SQL VARCHAR(8000) = ''
+ SET @SQL =                 '     select	convert(varchar(10), eun.DataInclusao, 103) as data '
+ SET @SQL = @SQL + CHAR(10) + 		'      ,convert(varchar(5), eun.DataInclusao, 114) as hora '
+ SET @SQL = @SQL + CHAR(10) + 		'     ,i.inter_codigo as internacao '
+ SET @SQL = @SQL + CHAR(10) +       '     ,p.pac_nome as nome '
+ SET @SQL = @SQL + CHAR(10) +       '     ,p.pac_idade	as idade '
+ SET @SQL = @SQL + CHAR(10) +       '     ,isnull( p.pac_cartao_nsaude, p.pac_cartao_nsaude_provisorio) as CNS '
+ SET @SQL = @SQL + CHAR(10) +       '    ,locint_descricao as leito '
+ SET @SQL = @SQL + CHAR(10) +       '    , i.inter_datainter as dtinternacao '
+ SET @SQL = @SQL + CHAR(10) +       '    , eun.Diurese as Diurese '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.TAxMax as TAxMax '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Hgt as Hgt ' 
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Hd as Hd '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Insulina as Insulina '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.FuncaoIntestinal as FuncaoIntestinal '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Bh as Bh '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Intercorrencia as Intercorrencia '
+ SET @SQL = @SQL + CHAR(10) +       '     ,eun.Conduta as Conduta '
+ SET @SQL = @SQL + CHAR(10) +       '     ,isnull(eun.rascunho,0) as Rascunho '
+ SET @SQL = @SQL + CHAR(10) +	    '    , prof.prof_nome '
+ SET @SQL = @SQL + CHAR(10) +   '  from EvolucaoUtiNoturna eun '
+ SET @SQL = @SQL + CHAR(10) +   ' inner join internacao i on eun.inter_codigo = i.inter_codigo '
+ SET @SQL = @SQL + CHAR(10) +   ' inner join  VWLEITO_COMPLETO l on l.lei_codigo = i.lei_codigo and l.locatend_codigo = i.locatend_leito '
+ SET @SQL = @SQL + CHAR(10) +   ' inner join  paciente p on p.pac_codigo = i.pac_codigo '
+ SET @SQL = @SQL + CHAR(10) +   '  inner join Profissional prof on prof.prof_codigo = eun.prof_codigo and prof.locatend_codigo = eun.locatend_codigo '
+ SET @SQL = @SQL + CHAR(10) +   ' where eun.evouti_codigo  in( ' + @EVOUTI_CODIGO + ' ) '
+ SET @SQL = @SQL + CHAR(10) +   ' and   eun.inter_codigo = isnull(''' + @inter_codigo + ''', eun.inter_codigo) ' 
+EXEC (@SQL)
+END 
+GO
+
+
+ALTER PROCEDURE [dbo].[ksp_evolucao_impresso]  
+@inter_codigo CHAR (12), @upa_evo_codigo VARCHAR (20)=null  
+AS  
+   SET NOCOUNT ON
+   
+   DECLARE @SQL VARCHAR(MAX) = '', @ORDEM VARCHAR(4)
+   
+   SELECT TOP 1 @ORDEM = U.Usa_OrdemCronologicaEvolucao
+     FROM UPA_EVOLUCAO E
+     JOIN internacao AS i ON e.inter_codigo = i.inter_codigo
+     JOIN paciente AS pac ON i.pac_codigo = pac.pac_codigo
+     JOIN unidade AS U ON U.unid_codigo = PAC.unid_codigo
+    WHERE E.INTER_CODIGO = @inter_codigo
+   
+   SET @SQL = @SQL + ' DECLARE @inter_codigo CHAR(12) = '''+@inter_codigo+''''
+   SET @SQL = @SQL + '       , @upa_evo_codigo VARCHAR(20) = '+CASE WHEN @upa_evo_codigo IS NULL THEN 'NULL' ELSE ''''+@upa_evo_codigo+'''' END
+   SET @SQL = @SQL + '      SELECT E.UPAEVO_CODIGO '
+   SET @SQL = @SQL + '           , E.UPAEVO_DATAHORA '
+   SET @SQL = @SQL + '           , E.UPAEVO_DESCRICAO '
+   SET @SQL = @SQL + '           , pac.pac_nome '
+   SET @SQL = @SQL + '           , pac.pac_sexo '
+   SET @SQL = @SQL + '           , ISNULL(pac.pac_cartao_nsaude, pac.pac_cartao_nsaude_provisorio) as pac_cartao_nsaude '
+   SET @SQL = @SQL + '           , CASE WHEN pac.pac_sexo = ''M'' THEN ''MASC'' ELSE ''FEM'' END as sexo '
+   SET @SQL = @SQL + '           , CONVERT(VARCHAR, dbo.CalculaIdade(GETDATE(), pac.pac_nascimento)) + '' anos'' as idade '
+   SET @SQL = @SQL + '           , la.locatend_descricao '
+   SET @SQL = @SQL + '           , lc.LOCINT_DESCRICAO as leito '
+   SET @SQL = @SQL + '           , ltrim(rtrim(P.PROF_NOME)) +'' - ''+ tp.tipprof_descricao as PROF_NOME '
+   SET @SQL = @SQL + '           , la.LocAtend_descricao '
+   SET @SQL = @SQL + '           , LTRIM(RTRIM(E.CID_CODIGO_PRIMARIO)) + '' - '' + CID1.CID_DESCRICAO AS CID_PRIMARIO '
+   SET @SQL = @SQL + '           , LTRIM(RTRIM(E.CID_CODIGO_SECUNDARIO)) + '' - ''+ CID2.CID_DESCRICAO AS CID_SECUNDARIO '
+   SET @SQL = @SQL + '           , upaevo_pa '
+   SET @SQL = @SQL + '           , upaevo_pulso '
+   SET @SQL = @SQL + '           , upaevo_frequencia_respiratoria '
+   SET @SQL = @SQL + '           , upaevo_temperatura '
+   SET @SQL = @SQL + '           , upaevo_satO2 '
+   SET @SQL = @SQL + '           , upaevo_hgt '
+   SET @SQL = @SQL + '           , upaevo_cintura_circunferencia '
+   SET @SQL = @SQL + '           , pr.no_procedimento '
+   SET @SQL = @SQL + '           , DATEDIFF(day,i.inter_datainter,E.UPAEVO_DATAHORA) AS dias_internacao '
+   SET @SQL = @SQL + '           , tp.tipprof_descricao '
+   SET @SQL = @SQL + '           , p.prof_numconselho '
+   SET @SQL = @SQL + '           , CASE WHEN e.cid_codigo_primario <> (SELECT TOP 1 e1.cid_codigo_primario '
+   SET @SQL = @SQL + '                                                   FROM upa_evolucao e1 '
+   SET @SQL = @SQL + '                                                  WHERE e1.inter_codigo = e.inter_codigo AND e1.upaevo_codigo < e.upaevo_codigo '
+   SET @SQL = @SQL + '                                               ORDER BY e1.upaevo_codigo desc) '
+   SET @SQL = @SQL + '                    OR (e.upaevo_codigo = (SELECT MIN(upaevo_codigo) '
+   SET @SQL = @SQL + '                                             FROM upa_evolucao e1 '
+   SET @SQL = @SQL + '                                            WHERE e1.inter_codigo = e.inter_codigo) '
+   SET @SQL = @SQL + '                   AND e.cid_codigo_primario <> (SELECT TOP 1 cidpri_codigo '
+   SET @SQL = @SQL + '                                                   FROM internacao_procedimento_cid ip '
+   SET @SQL = @SQL + '                                                  WHERE ip.inter_codigo = e.inter_codigo AND upaevo_codigo IS NULL '
+   SET @SQL = @SQL + '                                                   ORDER BY procid_datahora DESC)) '
+   SET @SQL = @SQL + '                THEN 1 ELSE 0 '
+   SET @SQL = @SQL + '             END AS mudou_cid '
+   SET @SQL = @SQL + '           , ISNULL(E.Rascunho,0) AS Rascunho '
+   SET @SQL = @SQL + '        FROM UPA_EVOLUCAO E '
+   SET @SQL = @SQL + '  INNER JOIN internacao AS i ON e.inter_codigo = i.inter_codigo '
+   SET @SQL = @SQL + '  INNER JOIN paciente AS pac ON i.pac_codigo = pac.pac_codigo '
+   SET @SQL = @SQL + '   LEFT JOIN PROFISSIONAL AS P ON (P.PROF_CODIGO = E.PROF_CODIGO AND P.LOCATEND_CODIGO = E.LOCATEND_CODIGO) '
+   SET @SQL = @SQL + '   LEFT JOIN vwLocal_Unidade AS la ON (la.LOCATEND_CODIGO = P.LOCATEND_CODIGO) '
+   SET @SQL = @SQL + '   LEFT JOIN vwleito_completo AS lc ON i.locatend_leito = lc.LOCATEND_CODIGO AND i.lei_codigo = lc.lei_codigo '
+   SET @SQL = @SQL + '   LEFT JOIN CID_10 AS CID1 ON (CID1.CID_CODIGO = E.CID_CODIGO_PRIMARIO) '
+   SET @SQL = @SQL + '   LEFT JOIN CID_10 AS CID2 ON (CID2.CID_CODIGO = E.CID_CODIGO_SECUNDARIO) '
+   SET @SQL = @SQL + '   LEFT JOIN internacao_procedimento_cid  AS procid2 ON PROCID2.inter_codigo = E.inter_codigo AND PROCID2.upaevo_codigo = E.upaevo_codigo AND PROCID2.prof_codigo = E.prof_codigo '
+   SET @SQL = @SQL + '   LEFT JOIN TB_procedimento AS PR ON  procid2.proc_codigo = PR.CO_PROCEDIMENTO '
+   SET @SQL = @SQL + '   LEFT JOIN tipo_profissional AS tp ON (p.tipprof_codigo = tp.tipprof_codigo) '
+   SET @SQL = @SQL + '       WHERE 1 = 1 '
+   SET @SQL = @SQL + '         AND (@inter_codigo is not null AND (@upa_evo_codigo is null or @upa_evo_codigo = '''') AND E.INTER_CODIGO = @INTER_CODIGO) or (@upa_evo_codigo is not null AND @upa_evo_codigo <> '''' AND e.upaevo_codigo in ('+ @upa_evo_codigo + ' )) '
+   SET @SQL = @SQL + '    ORDER BY e.UPAEVO_DATAHORA ' + ISNULL(@ORDEM,'DESC')
+     
+   exec (@SQL)
+   
+   ------------------------------------------------------------------------------------------  
+   IF (@@ERROR <> 0)  
+   BEGIN  
+      RAISERROR('ERRO - ksp_Evolucao_Historico',1,1)  
+   END  
+     
+   SET NOCOUNT OFF
+go 
