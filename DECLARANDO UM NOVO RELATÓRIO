@@ -1,0 +1,25 @@
+# sql
+
+declare @id sysname = '757' declare @id sysname = '757'
+declare @sql varchar(max) = ''
+set @sql = ' select * '
+set @sql = @sql + 'from relatorio ' 
+set @sql = @sql + 'where relatorio_codigo in ('+ @id + ')'
+exec  (@sql)
+
+// FAZENDO CONSULTA COM INFORMAÇÕES // 
+
+select * from paciente where pac_codigo = '011501220001'
+select * from paciente where pac_codigo = 011501220001
+select * from relatorio where relatorio_nome like '%todos%'
+select * from Parametro_Relatorio
+
+// INSERINDO INFORMAÇÕES DO RELATÓRIO // 
+
+insert into relatorio (relatorio_codigo,relatorio_nome,relatorio_titulo,modulo_codigo,relatorio_acesso)
+values (790, 'relatorio_Evolucao_Impressao_geral.rpt','Evolução Impresso Geral', '01', null)
+
+insert into Parametro_Relatorio (unid_codigo,relatorio_codigo,relatorio_path,relatorio_destino_impressao,relatorio_confirmacao,relatorio_descricao,RELATORIO_TITULO,MODULO_CODIGO,RELATORIO_NOME)
+values (790, 'relatorio_Evolucao_Impressao_geral.rpt',, '01', null)
+select unid_codigo, 790, null,1,'S','Evolução Impresso Geral'
+from unidade
